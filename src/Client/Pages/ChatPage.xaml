@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:Client.ViewModels"
+             x:Class="Client.Pages.ChatPage">
+
+  <ContentPage.BindingContext>
+    <vm:ChatViewModel />
+  </ContentPage.BindingContext>
+
+  <StackLayout Padding="10">
+    <!-- Simple message list -->
+    <CollectionView ItemsSource="{Binding Messages}" x:Name="MessagesView">
+      <CollectionView.ItemTemplate>
+        <DataTemplate>
+          <StackLayout Padding="6">
+            <Label Text="{Binding SenderId}" FontAttributes="Bold" />
+            <Label Text="{Binding Text}" />
+            <Label Text="{Binding Timestamp}" FontSize="10" HorizontalOptions="End" />
+          </StackLayout>
+        </DataTemplate>
+      </CollectionView.ItemTemplate>
+    </CollectionView>
+
+    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto">
+      <Entry Text="{Binding OutgoingText}" Placeholder="Type a message" />
+      <Button Text="Send" Command="{Binding SendCommand}" Grid.Column="1" />
+    </Grid>
+  </StackLayout>
+</ContentPage>
