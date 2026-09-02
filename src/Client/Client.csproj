@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-	<TargetFrameworks>net10.0-android;net10.0-ios;net10.0-maccatalyst;net10.0-windows10.0</TargetFrameworks>
+	<PropertyGroup>
+	<!-- Target Android only for the client library to match MAUI app requirement -->
+	<TargetFramework>net9.0-android</TargetFramework>
 	<UseMaui>true</UseMaui>
-	<!-- Fix MA002 warning by enabling automatic package references for MAUI workloads -->
 	<PackageReferences>true</PackageReferences>
 	<ImplicitUsings>enable</ImplicitUsings>
 	<Nullable>enable</Nullable>
