@@ -1,23 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFrameworks>net8.0-android</TargetFrameworks>
     <OutputType>Exe</OutputType>
-    <RootNamespace>StylesChat</RootNamespace>
     <UseMaui>true</UseMaui>
     <SingleProject>true</SingleProject>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <AssemblyName>StylesChat</AssemblyName>
   </PropertyGroup>
-
   <ItemGroup>
-    <!-- App Icon -->
     <MauiIcon Include="Resources\AppIcon\appicon.svg" />
-
-    <!-- Splash Screen -->
     <MauiSplashScreen Include="Resources\Splash\splash.svg" />
-
-    <!-- Images -->
     <MauiImage Include="Resources\Images\*" />
-    <M
+    <MauiFont Include="Resources\Fonts\*" />
+    <MauiAsset Include="Resources\Raw\*" />
+  </ItemGroup>
+</Project>
