@@ -2,11 +2,12 @@ name: Build Android APK
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ master ]
 
 jobs:
   build:
     runs-on: windows-latest
-    
     steps:
     - uses: actions/checkout@v4
     
@@ -15,14 +16,14 @@ jobs:
       with:
         dotnet-version: '8.0.x'
         
-    - name: Setup MAUI
-      run: dotnet workload install maui
+    - name: Install MAUI Android
+      run: dotnet workload install maui-android
       
-    - name: Build Android
-      run: dotnet build StylesChat/StylesChat.csproj -c Release -f net8.0-android
+    - name: Build APK
+      run: dotnet build StylesChat.csproj -f net8.0-android -c Release
       
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: StylesChat-Android-APK
-        path: StylesChat/bin/Release/net8.0-android/**/*.apk
+        path: bin/Release/net8.0-android/**/*.apk
