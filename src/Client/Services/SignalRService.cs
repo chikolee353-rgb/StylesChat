@@ -13,64 +13,16 @@ public class SignalRService
 
     public async Task ConnectAsync(string baseUrl, string accessToken)
     {
+        await DisconnectAsync();
         _connection = new HubConnectionBuilder()
             .WithUrl(new Uri(new Uri(baseUrl), "/chatHub"), options =>
             {
-                options.AccessTokenProvider = () => Task.FromResult(accessToken);
+                options.AccessTokenProvider = () => Task.FromResult<string?>(accessToken);
             })
             .WithAutomaticReconnect()
             .Build();
 
-        _connection.On<object>("MessageReceived", message =>
-        {
-            try
-            {
-                // attempt to deserialize to Message
-                var json = System.Text.Json.JsonSerializer.Serialize(message);
-                var msg = System.Text.Json.JsonSerializer.Deserialize<Server.Models.Message>(json);
-                if (msg != null) MessageReceived?.Invoke(msg);
-            }
-            catch
-            {
-                // ignore deserialization errors
-            }
-        });
-
-        _connection.On<object>("PresenceUpdated", p =>
-        {
-            try
-            {
-                var json = System.Text.Json.JsonSerializer.Serialize(p);
-                var obj = System.Text.Json.JsonSerializer.Deserialize<System.Text.Json.JsonElement>(json);
-                if (obj.TryGetProperty("userId", out var u) && obj.TryGetProperty("status", out var s))
-                {
-                    PresenceUpdated?.Invoke(u.GetString() ?? string.Empty, s.GetString() ?? string.Empty);
-                }
-            }
-            catch
-            {
-                // ignore deserialization errors
-            }
-        });
-
-        _connection.On<object>("Typing", t =>
-        {
-            try
-            {
-                var json = System.Text.Json.JsonSerializer.Serialize(t);
-                var obj = System.Text.Json.JsonSerializer.Deserialize<System.Text.Json.JsonElement>(json);
-                if (obj.TryGetProperty("conversationId", out var c) && obj.TryGetProperty("isTyping", out var it))
-                {
-                    Typing?.Invoke(c.GetString() ?? string.Empty, it.GetBoolean());
-                }
-            }
-            catch
-            {
-                // ignore deserialization errors
-            }
-        });
-
-        _connection.On<string>("MessageDelivered", id => { /* TODO */ });
+        _connection.On<Server.Models.Message>("MessageReceived", message => MessageReceived?.Invoke(message));
 
         await _connection.StartAsync();
     }
@@ -81,8 +33,12 @@ public class SignalRService
         await _connection.InvokeAsync("SendMessage", payload);
     }
 
-    public Task DisconnectAsync()
+    public async Task DisconnectAsync()
     {
-        return _connection?.StopAsync() ?? Task.CompletedTask;
+        var connection = _connection;
+        _connection = null;
+        if (connection is null) return;
+        await connection.StopAsync();
+        await connection.DisposeAsync();
     }
 }

@@ -1,4 +1,6 @@
 using System.Collections.ObjectModel;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Windows.Input;
 using Microsoft.Maui.Dispatching;
 using Client.Services;
@@ -21,20 +23,30 @@ public class ChatViewModel : BindableObject
     }
 
     public ICommand SendCommand { get; }
+    private bool _initialized;
 
     public ChatViewModel()
     {
         SendCommand = new Command(async () => await SendAsync());
         _signalR.MessageReceived += OnMessageReceived;
-        _ = InitializeAsync();
     }
 
-    private async Task InitializeAsync()
+    public async Task InitializeAsync()
     {
-        // Use local dev server base url; in production use configuration
+        if (_initialized) return;
         var token = Preferences.Get("accessToken", string.Empty);
-        if (string.IsNullOrEmpty(token)) return;
-        await _signalR.ConnectAsync("https://10.0.2.2:5001", token); // emulator loopback mapping
+        if (string.IsNullOrEmpty(token)) throw new InvalidOperationException("Please sign in again.");
+
+        using var client = CreateAuthenticatedClient(token);
+        var history = await client.GetFromJsonAsync<List<Message>>("api/messages");
+        Messages.Clear();
+        foreach (var message in history ?? [])
+        {
+            Messages.Add(message);
+        }
+
+        await _signalR.ConnectAsync(ApiConfiguration.BaseUrl, token);
+        _initialized = true;
     }
 
     private void OnMessageReceived(Server.Models.Message msg)
@@ -45,8 +57,15 @@ public class ChatViewModel : BindableObject
     private async Task SendAsync()
     {
         if (string.IsNullOrWhiteSpace(OutgoingText)) return;
-        var dto = new MessageDto { SenderId = "", RecipientIds = new List<string> { /* recipient id */ }, Text = OutgoingText };
+        var dto = new MessageDto { Text = OutgoingText };
         await _signalR.SendMessage(dto);
         OutgoingText = string.Empty;
+    }
+
+    private static HttpClient CreateAuthenticatedClient(string token)
+    {
+        var client = new HttpClient { BaseAddress = new Uri(ApiConfiguration.BaseUrl) };
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        return client;
     }
 }

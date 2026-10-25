@@ -1,4 +1,5 @@
 using Microsoft.Maui.Controls;
+using Client.ViewModels;
 
 namespace Client.Pages;
 
@@ -8,5 +9,18 @@ public partial class ChatPage : ContentPage
     public ChatPage()
     {
         InitializeComponent();
+    }
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        try
+        {
+            await ((ChatViewModel)BindingContext).InitializeAsync();
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlertAsync("Chat unavailable", ex.Message, "OK");
+        }
     }
 }

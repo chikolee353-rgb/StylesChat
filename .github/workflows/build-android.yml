@@ -1,7 +1,12 @@
 ﻿name: Build Android APK
 
 on:
-  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -15,9 +20,13 @@ jobs:
       - name: Install MAUI
         run: dotnet workload install maui
       - name: Build
-        run: dotnet publish StylesChat.csproj -f net10.0-android -c Release -o out
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-release-apk
-          path: out/*.apk
+        run: dotnet publish StylesChat.csproj -f net10.0-android -c Release -p:AndroidPackageFormat=apk -p:ApiBaseUrl=https://styleschat-chikolee353-rgb.onrender.com/ -o out
+      - name: Publish APK release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: pwsh
+        run: |
+          $apk = Get-ChildItem out -Filter '*-Signed.apk' | Select-Object -First 1
+          if (-not $apk) { throw "Signed APK was not produced." }
+          Copy-Item $apk.FullName out/StylesChat.apk
+          gh release create "${{ github.ref_name }}" out/StylesChat.apk --title "StylesChat ${{ github.ref_name }}" --generate-notes
