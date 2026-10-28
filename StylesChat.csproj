@@ -1,19 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFrameworks>net10.0-android</TargetFrameworks>
-    <OutputType>Exe</OutputType>
-    <UseMaui>true</UseMaui>
-    <SingleProject>true</SingleProject>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-  
-</PropertyGroup>
-  <ItemGroup>
-  <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.0" />
-    <MauiIcon Include="Resources\AppIcon\appicon.svg" />
-    <MauiSplashScreen Include="Resources\Splash\splash.svg" />
-    <MauiImage Include="Resources\Images\*" />
-    <MauiFont Include="Resources\Fonts\*" />
-    <MauiAsset Include="Resources\Raw\*" />
-  </ItemGroup>
+  </PropertyGroup>
 </Project>
