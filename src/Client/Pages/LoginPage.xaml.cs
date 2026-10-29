@@ -39,7 +39,7 @@ public class LoginPage : ContentPage
         try
         {
             // Call server login endpoint
-            var client = new HttpClient { BaseAddress = new Uri("https://localhost:5001") };
+            var client = new HttpClient { BaseAddress = new Uri("https://styleschat-chikolee353-rgb.onrender.com") };
             var payload = new { Username = username, Password = password };
             var resp = await client.PostAsJsonAsync("api/auth/login", payload);
             if (!resp.IsSuccessStatusCode)

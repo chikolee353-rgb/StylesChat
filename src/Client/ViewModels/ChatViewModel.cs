@@ -34,7 +34,7 @@ public class ChatViewModel : BindableObject
         // Use local dev server base url; in production use configuration
         var token = Preferences.Get("accessToken", string.Empty);
         if (string.IsNullOrEmpty(token)) return;
-        await _signalR.ConnectAsync("https://10.0.2.2:5001", token); // emulator loopback mapping
+        await _signalR.ConnectAsync("https://styleschat-chikolee353-rgb.onrender.com", token); // emulator loopback mapping
     }
 
     private void OnMessageReceived(Server.Models.Message msg)
